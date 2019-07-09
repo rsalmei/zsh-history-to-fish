@@ -69,6 +69,6 @@ def exporter(input, output, dry_run, no_convert):
             meta, command_zsh = line.split(';', 1)
             command_fish, changed = converter(command_zsh)
             time = meta.split(':')[1].strip()
-            command_history = f'- cmd: {command_fish}\n   when: {time}\n'
+            command_history = f'- cmd: {command_fish}\n  when: {time}\n'
             display(command_zsh, command_fish, changed)
             writer(command_history)
