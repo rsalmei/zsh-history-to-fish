@@ -46,12 +46,12 @@ def display(zsh, fish, changed):
 def output_gen(output_file, dry_run):
     if dry_run:
         yield lambda x: None
-        print(f'No file was written')
+        print(f'No file has been written')
         return
 
     with open(output_file, 'a') as out:
         yield lambda x: out.write(x)
-    print(f'\nFile "{output_file}" wrote successfully')
+    print(f'\nFile "{output_file}" has been written successfully')
 
 
 @click.command(help=__description__)
