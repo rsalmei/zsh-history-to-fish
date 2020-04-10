@@ -1,3 +1,5 @@
+[<img align="right" src="https://cdn.buymeacoffee.com/buttons/default-orange.png" width="217px" height="51x">](https://www.buymeacoffee.com/rsalmei)
+
 [![PyPI version](https://img.shields.io/pypi/v/zsh-history-to-fish.svg)](https://pypi.python.org/pypi/zsh-history-to-fish/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/zsh-history-to-fish.svg)](https://pypi.python.org/pypi/zsh-history-to-fish/)
 [![PyPI status](https://img.shields.io/pypi/status/zsh-history-to-fish.svg)](https://pypi.python.org/pypi/zsh-history-to-fish/)
@@ -5,13 +7,13 @@
 
 # Bring your ZSH history to Fish shell
 
-This is a simple tool to ease the migration from ZSH to Fish shell, without losing your hard earned history commands.
+This is a simple tool to ease the migration from ZSH to Fish shell, without losing your hard-earned history commands.
 
 As I was migrating myself, I've found out there's no tool to do this automatically, so I've made one for my own use.
 For that, I had to search for the specifications of both history files, and ended up involved in multiple threads with the right devs to try to understand and make it work.
 In the process, I've stumbled upon several people interested in a such a tool.
 
-Well, it have worked! So I've wrapped it in a python lib to make it easy to use, and now I'm sharing with anyone who may need it.
+Well, it has worked! So I've wrapped it in a python package to make it easy to use, and now I'm sharing with anyone who may need it! It's released on PyPI.
 
 
 ## Get it

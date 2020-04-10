@@ -1,39 +1,42 @@
 import os
 from contextlib import contextmanager
+import subprocess
 
 import click
 
 from . import __description__
 
-ZSH_HISTORY = '~/.zsh_history'
-FISH_HISTORY = '~/.local/share/fish/fish_history'
+ZSH_HISTORY_FILE = '~/.zsh_history'
+FISH_HISTORY_FILE = '~/.local/share/fish/fish_history'
 DIM, Z, BLUE, YELLOW = '\033[2m', '\033[0m', '\033[94m', '\033[93m'
 
-
-def history(input):
-    with open(input, 'rb') as _in:
-        buf = ''
-        for line in _in:
-            line = line.replace(b'\xe2\x80\x83\xb4', b'-').decode('utf-8').strip()
-            if line.endswith('\\'):
-                buf += line[:-1] + '\\n'
-                continue
-
-            if not buf:
-                yield line
-                continue
-
-            yield buf + line
-            buf = ''
+# use zsh itself to read history file, since it is not utf-8 encoded.
+# suggested in https://github.com/rsalmei/zsh-history-to-fish/issues/2
+ZSH_HISTORY_READER = "zsh -i -c 'fc -R {}; fc -l -t \"%s\" 0'"
 
 
-def zsh_to_fish(cmd):
+def read_history(input_file):
+    command = ZSH_HISTORY_READER.format(input_file)
+    p = subprocess.run(command, capture_output=True, shell=True, encoding='utf8')
+    lines = p.stdout.splitlines()
+    yield from map(lambda x: x.replace('\\n', '\n'), lines)
+
+
+def parse_history(input_file):
+    yield from map(lambda x: x.split(maxsplit=2)[1:], read_history(input_file))
+
+
+def naive_zsh_to_fish(cmd):
     result = cmd \
         .replace(' && ', '&&') \
         .replace('&&', '; and ') \
         .replace(' || ', '||') \
         .replace('||', '; or ')
     return result, cmd != result
+
+
+def passthrough_zsh_to_fish(cmd):
+    return cmd, False
 
 
 def display(zsh, fish, changed):
@@ -43,7 +46,7 @@ def display(zsh, fish, changed):
 
 
 @contextmanager
-def output_gen(output_file, dry_run):
+def writer_factory(output_file, dry_run):
     if dry_run:
         yield lambda x: None
         print(f'No file has been written')
@@ -56,19 +59,18 @@ def output_gen(output_file, dry_run):
 
 @click.command(help=__description__)
 @click.version_option()
-@click.argument('input', type=click.Path(exists=True), required=False,
-                default=os.path.expanduser(ZSH_HISTORY))
-@click.option('--output', '-o', type=click.Path(), help='Optional output, will append to fish history by default',
-              default=os.path.expanduser(FISH_HISTORY))
+@click.argument('input_file', type=click.Path(exists=True), required=False,
+                default=os.path.expanduser(ZSH_HISTORY_FILE))
+@click.option('--output_file', '-o', type=click.Path(),
+              default=os.path.expanduser(FISH_HISTORY_FILE),
+              help='Optional output, will append to fish history by default')
 @click.option('--dry-run', '-d', is_flag=True, help='Do not write anything to filesystem')
 @click.option('--no-convert', '-n', is_flag=True, help='Do not naively convert commands')
-def exporter(input, output, dry_run, no_convert):
-    converter = (lambda x: (x, False)) if no_convert else zsh_to_fish
-    with output_gen(output, dry_run) as writer:
-        for line in history(input):
-            meta, command_zsh = line.split(';', 1)
+def exporter(input_file, output_file, dry_run, no_convert):
+    converter = passthrough_zsh_to_fish if no_convert else naive_zsh_to_fish
+    with writer_factory(output_file, dry_run) as writer:
+        for timestamp, command_zsh in parse_history(input_file):
             command_fish, changed = converter(command_zsh)
-            time = meta.split(':')[1].strip()
-            command_history = f'- cmd: {command_fish}\n  when: {time}\n'
             display(command_zsh, command_fish, changed)
-            writer(command_history)
+            fish_history = f'- cmd: {command_fish}\n  when: {timestamp}\n'
+            writer(fish_history)
