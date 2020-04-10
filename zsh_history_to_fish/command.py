@@ -1,5 +1,6 @@
 import os
 from contextlib import contextmanager
+import subprocess
 
 import click
 
@@ -9,23 +10,20 @@ ZSH_HISTORY = '~/.zsh_history'
 FISH_HISTORY = '~/.local/share/fish/fish_history'
 DIM, Z, BLUE, YELLOW = '\033[2m', '\033[0m', '\033[94m', '\033[93m'
 
+# use zsh itself to read history file, since it is not utf-8 encoded.
+# suggested in https://github.com/rsalmei/zsh-history-to-fish/issues/2
+ZSH_HISTORY_READER = "zsh -i -c 'fc -R {}; fc -l -t \"%s\" 0'"
 
-def history(input):
-    with open(input, 'rb') as _in:
-        buf = ''
-        for line in _in:
-            line = line.replace(b'\xe2\x80\x83\xb4', b'-').decode('utf-8').strip()
-            if line.endswith('\\'):
-                buf += line[:-1] + '\\n'
-                continue
 
-            if not buf:
-                yield line
-                continue
+def read_history(input_file):
+    command = ZSH_HISTORY_READER.format(input_file)
+    p = subprocess.run(command, capture_output=True, shell=True, encoding='utf8')
+    lines = p.stdout.splitlines()
+    yield from map(lambda x: x.replace('\\n', '\n'), lines)
 
-            yield buf + line
-            buf = ''
 
+def parse_history(input_file):
+    yield from map(lambda x: x.split(maxsplit=2)[1:], read_history(input_file))
 
 def zsh_to_fish(cmd):
     result = cmd \
@@ -67,8 +65,8 @@ def exporter(input, output, dry_run, no_convert):
     with output_gen(output, dry_run) as writer:
         for line in history(input):
             meta, command_zsh = line.split(';', 1)
+        for timestamp, command_zsh in parse_history(input_file):
             command_fish, changed = converter(command_zsh)
-            time = meta.split(':')[1].strip()
             command_history = f'- cmd: {command_fish}\n  when: {time}\n'
             display(command_zsh, command_fish, changed)
             writer(command_history)
