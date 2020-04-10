@@ -29,16 +29,16 @@ $ pip install zsh-history-to-fish
 
 ```bash
 $ zsh-history-to-fish --help
-Usage: zsh-history-to-fish [OPTIONS] [INPUT]
+Usage: zsh-history-to-fish [OPTIONS] [INPUT_FILE]
 
   Bring your ZSH history to Fish shell.
 
 Options:
-  --version          Show the version and exit.
-  -o, --output PATH  Optional output, will append to fish history by default
-  -d, --dry-run      Do not write anything to filesystem
-  -n, --no-convert   Do not naively convert commands
-  --help             Show this message and exit.
+  --version               Show the version and exit.
+  -o, --output_file PATH  Optional output, will append to fish history by default
+  -d, --dry-run           Do not write anything to filesystem
+  -n, --no-convert        Do not naively convert commands
+  --help                  Show this message and exit.
 ```
 
 
