@@ -48,6 +48,7 @@ This software is licensed under the MIT License. See the LICENSE file in the top
 
 ## Did you like it?
 
-Thanks for your interest!
+Thank you for your interest!
 
-I wish this tool can be useful to you! :)
+I've put much ❤️ and effort into this.
+<br>If you appreciate my work you can sponsor me, buy me a coffee! The button is on the top right of the page (the big orange one, it's hard to miss 😊)
