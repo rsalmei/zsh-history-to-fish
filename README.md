@@ -21,14 +21,14 @@ Well, it has worked! So I've wrapped it in a python package to make it easy to u
 Just do in your zsh shell:
 
 ```bash
-$ pip install zsh-history-to-fish
+❯ pip install zsh-history-to-fish
 ```
 
 
 ## How to use
 
 ```bash
-$ zsh-history-to-fish --help
+❯ zsh-history-to-fish --help
 Usage: zsh-history-to-fish [OPTIONS] [INPUT_FILE]
 
   Bring your ZSH history to Fish shell.
@@ -40,6 +40,24 @@ Options:
   -n, --no-convert        Do not naively convert commands
   --help                  Show this message and exit.
 ```
+
+A successful run looks like:
+```bash
+❯ zsh-history-to-fish -dn
+ZSH history to Fish
+===================
+input : /Users/rogerio/.zsh_history (naive-convert=False)
+output: dry run mode
+.......
+Processed 6515 commands.
+No file has been written.
+```
+
+
+## Changelog highlights:
+- 0.3.0: fix for empty history lines, and general command output improvements
+- 0.2.0: use actual `zsh` process to import history, since it does not use utf-8
+- 0.1.0: initial version 
 
 
 ## License
