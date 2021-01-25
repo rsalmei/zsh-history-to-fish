@@ -23,7 +23,8 @@ def read_history(input_file):
 
 
 def parse_history(input_file):
-    yield from map(lambda x: x.split(maxsplit=2)[1:], read_history(input_file))
+    stream = map(lambda x: x.split(maxsplit=2)[1:], read_history(input_file))
+    yield from filter(lambda x: len(x) > 1, stream)
 
 
 def naive_zsh_to_fish(cmd):
