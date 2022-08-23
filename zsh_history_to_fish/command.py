@@ -74,6 +74,7 @@ def exporter(input_file, output_file, dry_run, no_convert):
     converter = (lambda x: x) if no_convert else naive_zsh_to_fish
     changed = []
     with writer_factory(output_file, dry_run) as writer:
+        i = 0
         for i, (timestamp, command_zsh) in enumerate(parse_history(input_file)):
             command_fish = converter(command_zsh)
             fish_history = f'- cmd: {command_fish}\n  when: {timestamp}\n'
