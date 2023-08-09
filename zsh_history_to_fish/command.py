@@ -59,7 +59,7 @@ def writer_factory(output_file, dry_run):
 @click.command(help=__description__)
 @click.version_option()
 @click.argument('input_file', type=click.Path(exists=True), required=False,
-                default=os.path.expanduser(ZSH_HISTORY_FILE))
+                default=os.path.expanduser(HISTFILE))
 @click.option('--output_file', '-o', type=click.Path(),
               default=os.path.expanduser(FISH_HISTORY_FILE),
               help='Optional output, will append to fish history by default')
